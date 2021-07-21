@@ -68,6 +68,15 @@ module Etsy
         request.request_object.class.should == Etsy::V3::Request
       end
 
+      should "not amend original params" do
+        params = { api_version: 'v3' }
+        request = Request.new('', params)
+
+        request.base_path.should == '/v3/application'
+        request.request_object.class.should == Etsy::V3::Request
+        params.should == { api_version: 'v3' }
+      end
+
       should "append the api_key to the parameters in basic mode" do
         Etsy.expects(:api_key).with().returns('key')
         Request.stubs(:secure?).returns(false)

@@ -41,9 +41,10 @@ module Etsy
 
     # Create a new request for the resource with optional parameters
     def initialize(resource_path, parameters = {})
-      @api_version = get_api_version(parameters.delete(:api_version))
+      params = parameters.dup
+      @api_version = get_api_version(params.delete(:api_version))
 
-      initialize_request_object(resource_path, parameters)
+      initialize_request_object(resource_path, params)
     end
     attr_reader :request_object,
                 :api_version
