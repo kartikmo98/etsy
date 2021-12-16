@@ -106,6 +106,20 @@ module Etsy
             end
           end
 
+          context 'when code is 404' do
+            context 'when the body states that the resource cannot be found' do
+              should "raise a ResourceNotFound exception" do
+                raw_response = mock
+                raw_response.stubs(body: 'Could not find a Listing with listing_id = XXXXX', code: 404)
+                r = V2::Response.new(raw_response)
+
+                exception = assert_raises(Etsy::ResourceNotFound) { r.to_hash }
+                assert_equal(404, exception.code)
+                assert_equal('Could not find a Listing with listing_id = XXXXX', exception.data)
+              end
+            end
+          end
+
           context 'when code is 409' do
             context 'when the body states that resource is busy' do
               should "raise a ResourceIsBusy exception" do

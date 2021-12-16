@@ -18,6 +18,7 @@ module Etsy
   class ServerError < EtsyJSONInvalid; end
   class TemporaryServerError < EtsyJSONInvalid; end
   class ResourceIsBusy < EtsyJSONInvalid; end
+  class ResourceNotFound < EtsyJSONInvalid; end
   class AllQuantitiesAreZero < EtsyJSONInvalid; end
   class RequestCannotBeRecognized < EtsyJSONInvalid; end
   class UriTooLong < EtsyJSONInvalid; end

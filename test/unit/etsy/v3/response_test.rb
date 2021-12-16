@@ -98,6 +98,30 @@ module Etsy
             end
           end
 
+          context 'when code is 404' do
+            context 'when the body states that the resource cannot be found' do
+              should 'raise a ResourceNotFound exception' do
+                response_options = {
+                  method: :get,
+                  url: 'https://openapi.etsy.com/v3/application/shops/YYYY/receipts/XXXX',
+                  status: 404,
+                  response_body: { 'error' => 'Could not find a Shop Receipt with receipt_id = XXXX associated with shop_id = YYYY.' }.to_json
+                }
+
+                Etsy.silent_errors = false
+                response = V3::Response.new(Faraday::Response.new(response_options))
+
+                response.success?.should == false
+                response.code.should     == 404
+                response.body.should     == response_options[:response_body]
+
+                exception = assert_raises(Etsy::ResourceNotFound) { response.result }
+                exception.code.should == 404
+                exception.data.should == 'Could not find a Shop Receipt with receipt_id = XXXX associated with shop_id = YYYY.'
+              end
+            end
+          end
+
           context 'when code is 409' do
             context 'when the body states that resource is busy' do
               should 'raise a ResourceIsBusy exception' do
