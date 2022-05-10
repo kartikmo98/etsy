@@ -1,6 +1,7 @@
 module Etsy
   class BaseEtsyException < StandardError; end
   class OAuthTokenRevoked < BaseEtsyException; end
+  class OAuthTokenExpired < BaseEtsyException; end
   class MissingShopID < BaseEtsyException; end
   class TemporaryIssue < BaseEtsyException; end
   class ResourceUnavailable < TemporaryIssue; end
@@ -87,13 +88,14 @@ module Etsy
     end
 
     def validate!
-      raise OAuthTokenRevoked         if token_revoked?
-      raise MissingShopID             if missing_shop_id?
-      raise InvalidUserID             if invalid_user_id?
-      raise TemporaryIssue            if temporary_etsy_issue?
-      raise ResourceUnavailable       if resource_unavailable?
-      raise ExceededRateLimit         if exceeded_rate_limit?
-      raise ExceededOverallRateLimit  if exceeded_overall_limit?
+      raise OAuthTokenRevoked              if token_revoked?
+      raise MissingShopID                  if missing_shop_id?
+      raise InvalidUserID                  if invalid_user_id?
+      raise TemporaryIssue                 if temporary_etsy_issue?
+      raise ResourceUnavailable            if resource_unavailable?
+      raise ExceededRateLimit              if exceeded_rate_limit?
+      raise ExceededOverallRateLimit       if exceeded_overall_limit?
+      raise(OAuthTokenExpired, error_data) if token_expired?
 
       raise invalid_json_class.new({ code: code, data: error_data }) if failed_response?
 
@@ -203,6 +205,10 @@ module Etsy
 
     def token_revoked?
       data == "oauth_problem=token_revoked"
+    end
+
+    def token_expired?
+      data =~ /access token is expired/ && code.to_s == '401'
     end
 
     def missing_shop_id?

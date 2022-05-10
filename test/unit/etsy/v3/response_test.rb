@@ -268,6 +268,30 @@ module Etsy
             end
           end
 
+          context 'when code is 401' do
+            context 'when body says that access token is expired' do
+              should 'raise a OAuthTokenExpired exception' do
+                response_options = {
+                  method: :get,
+                  url: 'https://openapi.etsy.com/v3/application/listings/10',
+                  status: 401,
+                  reason_phrase: 'Unauthorized',
+                  response_body: { 'error' => 'invalid_token', 'error_description' => 'access token is expired' }.to_json
+                }
+
+                Etsy.silent_errors = false
+                response = V3::Response.new(Faraday::Response.new(response_options))
+
+                response.success?.should == false
+                response.code.should     == 401
+                response.body.should     == response_options[:response_body]
+
+                exception = assert_raises(Etsy::OAuthTokenExpired) { response.result }
+                exception.message.should == 'invalid_token, access token is expired'
+              end
+            end
+          end
+
           context 'when code is 429' do
             should 'raise a ExceededOverallRateLimit exception' do
               puts("Pending: #{self.method_name}")

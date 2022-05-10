@@ -28,8 +28,16 @@ module Etsy
       private
 
       def error_data
-        parsed = JSON.parse(body)
-        parsed.fetch('error', parsed)
+        parsed_data = JSON.parse(body)
+
+        error_data_array =
+          parsed_data
+            .values_at('error', 'error_description')
+            .compact
+
+        return parsed_data if error_data_array.blank?
+
+        error_data_array.join(', ')
 
       rescue JSON::ParserError
         body
