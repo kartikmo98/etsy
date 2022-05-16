@@ -94,8 +94,13 @@ module Etsy
       raise TemporaryIssue                 if temporary_etsy_issue?
       raise ResourceUnavailable            if resource_unavailable?
       raise ExceededRateLimit              if exceeded_rate_limit?
-      raise ExceededOverallRateLimit       if exceeded_overall_limit?
       raise(OAuthTokenExpired, error_data) if token_expired?
+      if exceeded_overall_limit?
+        raise(
+          ExceededOverallRateLimit,
+          [@raw_response.try(:message), @raw_response.body].select(&:present?).join(', ')
+        )
+      end
 
       raise invalid_json_class.new({ code: code, data: error_data }) if failed_response?
 

@@ -225,7 +225,8 @@ module Etsy
               raw_response.body.stubs('closed?' => true)
               r = V2::Response.new(raw_response)
 
-              lambda { r.to_hash }.should raise_error(Etsy::ExceededOverallRateLimit)
+              exception = assert_raises(Etsy::ExceededOverallRateLimit) { r.to_hash }
+              assert_equal('Too Many Requests', exception.message)
             end
           end
 
