@@ -233,7 +233,7 @@ module Etsy
     end
 
     def exceeded_rate_limit?
-      data =~ /You have exceeded/
+      data =~ /You have exceeded/ || data =~ /Exceeded per second rate limit/
     end
 
     def exceeded_overall_limit?

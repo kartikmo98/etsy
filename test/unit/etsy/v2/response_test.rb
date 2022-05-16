@@ -294,6 +294,18 @@ module Etsy
           assert_equal(exception_message, exception.message)
         end
 
+        should "raise ExceededRateLimit when exceeded limit per second" do
+          exception_message = '{"error":"Exceeded per second rate limit"}'
+
+          raw_response = Net::HTTPTooManyRequests.new('1.1', '429', exception_message)
+          raw_response.stubs(body: '')
+          raw_response.body.stubs('closed?' => true)
+          r = V2::Response.new(raw_response)
+
+          exception = assert_raises(Etsy::ExceededOverallRateLimit) { r.to_hash }
+          assert_equal(exception_message, exception.message)
+        end
+
         should "provide the code" do
           raw_response = mock
           raw_response.expects(:code => "400")

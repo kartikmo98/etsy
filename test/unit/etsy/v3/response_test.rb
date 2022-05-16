@@ -293,8 +293,32 @@ module Etsy
           end
 
           context 'when code is 429' do
-            should 'raise a ExceededOverallRateLimit exception' do
-              puts("Pending: #{self.method_name}")
+            context 'when exceeded limit per second' do
+              should "raise ExceededRateLimit when exceeded limit per second" do
+                exception_message = 'Exceeded per second rate limit'
+
+                response_options = {
+                  method: :get,
+                  url: 'https://openapi.etsy.com/v3/application/listings/10',
+                  status: 429,
+                  reason_phrase: 'Too Many Requests',
+                  response_body: { 'error' => exception_message }.to_json
+                }
+                response = V3::Response.new(Faraday::Response.new(response_options))
+
+                response.success?.should == false
+                response.code.should     == 429
+                response.body.should     == response_options[:response_body]
+
+                exception = assert_raises(Etsy::ExceededRateLimit) { response.result }
+                exception.message.should == exception_message
+              end
+            end
+
+            context 'when received another exception' do
+              should 'raise a ExceededOverallRateLimit exception' do
+                puts("Pending: #{self.method_name}")
+              end
             end
           end
 
