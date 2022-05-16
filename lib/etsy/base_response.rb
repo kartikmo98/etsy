@@ -93,7 +93,7 @@ module Etsy
       raise InvalidUserID                  if invalid_user_id?
       raise TemporaryIssue                 if temporary_etsy_issue?
       raise ResourceUnavailable            if resource_unavailable?
-      raise ExceededRateLimit              if exceeded_rate_limit?
+      raise(ExceededRateLimit, error_data) if exceeded_rate_limit?
       raise(OAuthTokenExpired, error_data) if token_expired?
       if exceeded_overall_limit?
         raise(

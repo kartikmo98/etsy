@@ -284,11 +284,14 @@ module Etsy
         end
 
         should "raise ExceededRateLimit" do
+          exception_message = 'something You have exceeded your API limit something'
+
           raw_response = mock
-          raw_response.stubs(:body => "something You have exceeded your API limit something")
+          raw_response.stubs(:body => exception_message)
           r = V2::Response.new(raw_response)
 
-          lambda { r.to_hash }.should raise_error(Etsy::ExceededRateLimit)
+          exception = assert_raises(Etsy::ExceededRateLimit) { r.to_hash }
+          assert_equal(exception_message, exception.message)
         end
 
         should "provide the code" do
