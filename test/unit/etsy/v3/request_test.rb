@@ -217,8 +217,8 @@ module Etsy
           should 'have default options' do
             with_etsy_app_keys(api_key: 'api_key_X', api_secret: 'api_secret_X', user_agent: 'TestApp') do
               expected_options = {
-                token_url: '/oauth/token',
-                authorize_url: '/oauth/authorize',
+                token_url: 'oauth/token',
+                authorize_url: 'oauth/authorize',
                 max_redirects: 5,
                 token_method: :post,
                 raise_errors: false,
