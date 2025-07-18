@@ -41,6 +41,10 @@ module Etsy
       raise NotImplementedError
     end
 
+    def patch
+      raise NotImplementedError
+    end
+
     def delete
       raise NotImplementedError
     end

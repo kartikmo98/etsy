@@ -27,6 +27,11 @@ module Etsy
         Response.call(request.put, api_version: request.api_version)
       end
 
+      def patch(resource_path, parameters = {})
+        request = Request.new(resource_path, parameters)
+        Response.call(request.patch, api_version: request.api_version)
+      end
+
       def delete(resource_path, parameters = {})
         request = Request.new(resource_path, parameters)
         Response.call(request.delete, api_version: request.api_version)
@@ -54,6 +59,7 @@ module Etsy
                    :base_path,
                    :post,
                    :put,
+                   :patch,
                    :delete,
                    :client,
                    :query,

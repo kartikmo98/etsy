@@ -111,6 +111,40 @@ module Etsy
           end
         end
 
+        context 'when \'patch\' requested' do
+          should 'call \'patch\' of the oauth token object' do
+            with_etsy_app_keys(api_key: 'api_key_X', api_secret: 'api_secret_X') do
+              params = [
+                '/shops/1/listings/1',
+                {
+                  access_token: 'client_token',
+                  description: 'updated description'
+                }
+              ]
+
+              request        = Etsy::V3::Request.new(*params)
+              client         = request.client
+              oauth_response = stub()
+              response       = stub()
+
+              oauth_response
+                .stubs(:response)
+                .returns(response)
+
+              client
+                .expects(:patch)
+                .with(
+                  'shops/1/listings/1',
+                  body: { description: 'updated description' },
+                  headers: { 'x-api-key' => 'api_key_X' }
+                )
+                .returns(oauth_response)
+
+              request.patch.should == response
+            end
+          end
+        end
+
         context 'when \'post\' requested' do
           should 'call \'post\' of the oauth token object' do
             with_etsy_app_keys(api_key: 'api_key_X', api_secret: 'api_secret_X') do
@@ -217,8 +251,8 @@ module Etsy
           should 'have default options' do
             with_etsy_app_keys(api_key: 'api_key_X', api_secret: 'api_secret_X', user_agent: 'TestApp') do
               expected_options = {
-                token_url: '/oauth/token',
-                authorize_url: '/oauth/authorize',
+                token_url: 'oauth/token',
+                authorize_url: 'oauth/authorize',
                 max_redirects: 5,
                 token_method: :post,
                 raise_errors: false,

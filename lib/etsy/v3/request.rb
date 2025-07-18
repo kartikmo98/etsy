@@ -28,6 +28,10 @@ module Etsy
         make_request(:put, resource_path, body: @parameters)
       end
 
+      def patch
+        make_request(:patch, resource_path, body: @parameters)
+      end
+
       def post
         make_request(:post, resource_path, body: @parameters)
       end
