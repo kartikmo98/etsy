@@ -3,11 +3,6 @@ require File.expand_path('../../../../test_helper', __FILE__)
 module Etsy
   module V3
     class RequestTest < Test::Unit::TestCase
-      def setup
-        Etsy.shared_secret = nil
-        Thread.current[:etsy_shared_secret] = nil
-      end
-
       context 'when v2 params passed for initialization' do
         should 'strip them from parameters' do
           v3_request_params = {
