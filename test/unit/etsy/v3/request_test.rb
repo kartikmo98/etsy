@@ -3,6 +3,11 @@ require File.expand_path('../../../../test_helper', __FILE__)
 module Etsy
   module V3
     class RequestTest < Test::Unit::TestCase
+      def setup
+        Etsy.shared_secret = nil
+        Thread.current[:etsy_shared_secret] = nil
+      end
+
       context 'when v2 params passed for initialization' do
         should 'strip them from parameters' do
           v3_request_params = {
@@ -70,6 +75,34 @@ module Etsy
               client
                 .expects(:get)
                 .with('shops/1/listings', params: { state: 'active' }, headers: { 'x-api-key' => 'api_key_X' })
+                .returns(oauth_response)
+
+              request.get.should == response
+            end
+          end
+
+          should 'include shared secret in x-api-key header when set' do
+            with_etsy_app_keys(api_key: 'api_key_X', api_secret: 'api_secret_X', shared_secret: 'shared_secret_X') do
+              params = [
+                '/shops/1/listings',
+                {
+                  access_token: 'client_token',
+                  state: 'active'
+                }
+              ]
+
+              request        = Etsy::V3::Request.new(*params)
+              client         = request.client
+              oauth_response = stub()
+              response       = stub()
+
+              oauth_response
+                .stubs(:response)
+                .returns(response)
+
+              client
+                .expects(:get)
+                .with('shops/1/listings', params: { state: 'active' }, headers: { 'x-api-key' => 'api_key_X:shared_secret_X' })
                 .returns(oauth_response)
 
               request.get.should == response

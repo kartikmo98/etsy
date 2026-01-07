@@ -104,7 +104,7 @@ module Etsy
   end
 
   def self.shared_secret=(secret)
-    @shared_secret ||= secret
+    @shared_secret = secret
     Thread.current[:etsy_shared_secret] = secret
   end
 
